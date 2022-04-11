@@ -49,15 +49,15 @@ Anissa HACENE
 
 ## Version History
 
-* 0.2
+* v0.0.2
   * Various bug fixes and optimizations
-  * See [commit change]() or See [release history]()
-* 0.1
-  * Initial Release
+  * See [commit change](ChangeME.com) or See [release history](changeME.com)
+* v0.0.1
+  * Initial Release [commit change](https://github.com/ticuss/Smart-City-Project/commits/v0.0.1) and [release history](https://github.com/ticuss/Smart-City-Project/releases/tag/v0.0.1)
 
 ## License
 
-This project is licensed under the [NAME HERE] License - see the LICENSE.md file for details
+This project is licensed under Constantin BOGDANAS and Anissa HACENE License - see the LICENSE.md file for details
 
 ## Acknowledgments
 
