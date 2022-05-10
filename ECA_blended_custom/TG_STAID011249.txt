@@ -1,21 +1,21 @@
-EUROPEAN CLIMATE ASSESSMENT & DATASET (ECA&D), file created on 02-05-2022
-THESE DATA CAN BE USED FREELY PROVIDED THAT THE FOLLOWING SOURCE IS ACKNOWLEDGED:
-
-Klein Tank, A.M.G. and Coauthors, 2002. Daily dataset of 20th-century surface
-air temperature and precipitation series for the European Climate Assessment.
-Int. J. of Climatol., 22, 1441-1453.
-Data and metadata available at http://www.ecad.eu
-
-FILE FORMAT (MISSING VALUE CODE IS -9999):
-
-01-06 SOUID: Source identifier
-08-15 DATE : Date YYYYMMDD
-17-21 TG   : mean temperature in 0.1 &#176;C
-23-27 Q_TG : Quality code for TG (0='valid'; 1='suspect'; 9='missing')
-
-This is the blended series of station FRANCE, ORLY (STAID: 11249).
-Blended and updated with sources: 171642 907149 
-See file sources.txt and stations.txt for more info.
+# EUROPEAN CLIMATE ASSESSMENT & DATASET (ECA&D), file created on 02-05-2022
+# THESE DATA CAN BE USED FREELY PROVIDED THAT THE FOLLOWING SOURCE IS ACKNOWLEDGED:
+# 
+# Klein Tank, A.M.G. and Coauthors, 2002. Daily dataset of 20th-century surface
+# air temperature and precipitation series for the European Climate Assessment.
+# Int. J. of Climatol., 22, 1441-1453.
+# Data and metadata available at http://www.ecad.eu
+# 
+# FILE FORMAT (MISSING VALUE CODE IS -9999):
+# 
+# 01-06 SOUID: Source identifier
+# 08-15 DATE : Date YYYYMMDD
+# 17-21 TG   : mean temperature in 0.1 &#176;C
+# 23-27 Q_TG : Quality code for TG (0='valid'; 1='suspect'; 9='missing')
+# 
+# This is the blended series of station FRANCE, ORLY (STAID: 11249).
+# Blended and updated with sources: 171642 907149 
+# See file sources.txt and stations.txt for more info.
 
  SOUID,    DATE,   TG, Q_TG
 171642,19210301,   50,    0
