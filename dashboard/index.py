@@ -164,8 +164,9 @@ app.layout = html.Div(
                             data=[
                                 go.Pie(
                                     name="kek",
-                                    title="Diagramme de camembert des anomalies par arrondissement",
+                                    title="Pie chart des anomalies par arrondissement",
                                     titlefont={"color": "white", "size": 30},
+                                    labels=arrondissement_count.index,
                                     values=arrondissement_count.values,
                                     textfont=dict(size=13),
                                     rotation=45
