@@ -1,17 +1,61 @@
+from zipfile import ZipFile
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
 import plotly.graph_objs as go
 import pandas as pd
+import plotly.express as px
 
 url_confirmed = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv"
 url_deaths = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv"
 url_recovered = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_recovered_global.csv"
 
+
+def get_data(path: str) -> pd.DataFrame:
+    """
+    Get data from zip file
+    """
+    with ZipFile(path) as myzip:
+        data = myzip.open(path.split(".zip")[0])
+
+    df = pd.read_csv(data, sep=";")
+    return df
+
+
 confirmed = pd.read_csv(url_confirmed)
 deaths = pd.read_csv(url_deaths)
 recovered = pd.read_csv(url_recovered)
+df_final = get_data("DMR_2021_2022.csv.zip")
+df_dec = df_final.groupby(["DATE DECLARATION", "TYPE DECLARATION"]).count()
+df_dec = df_dec.reset_index()
+df_dec["DATE DECLARATION"] = pd.to_datetime(
+    df_dec["DATE DECLARATION"], infer_datetime_format=True, dayfirst=True
+)
+arrondissement_count = df_final["ARRONDISSEMENT"].value_counts()
+
+
+fig4 = px.line(
+    df_dec,
+    x="DATE DECLARATION",
+    y="SOUS TYPE DECLARATION",
+    color="TYPE DECLARATION",
+    title="Declarations par type",
+)
+fig4.update_xaxes(
+    tickformat="%b\n%Y",
+    rangeslider_visible=True,
+)
+fig4.update_layout(
+    width=800,
+    height=520,
+    plot_bgcolor="#1f2c56",
+    paper_bgcolor="#1f2c56",
+    hovermode="closest",
+    titlefont={"color": "white", "size": 20},
+    showlegend=False,
+    font=dict(family="sans-serif", size=12, color="white"),
+),
 
 
 # Unpivot data frames
@@ -94,51 +138,27 @@ app.layout = html.Div(
             [
                 html.Div(
                     [
-                        html.Img(
-                            src=app.get_asset_url("corona-logo-1.jpg"),
-                            id="corona-image",
-                            style={
-                                "height": "60px",
-                                "width": "auto",
-                                "margin-bottom": "25px",
-                            },
-                        )
-                    ],
-                    className="one-third column",
-                ),
-                html.Div(
-                    [
                         html.Div(
                             [
                                 html.H3(
-                                    "Covid - 19",
-                                    style={"margin-bottom": "0px", "color": "white"},
+                                    "Anomalies a Paris",
+                                    style={
+                                        "margin-bottom": "0px",
+                                        "color": "white",
+                                        "text-align": "center",
+                                    },
                                 ),
                                 html.H5(
-                                    "Track Covid - 19 Cases",
+                                    "Anomalies signalées par les services de la DMR",
                                     style={"margin-top": "0px", "color": "white"},
                                 ),
                             ]
                         )
                     ],
-                    className="one-half column",
                     id="title",
-                ),
-                html.Div(
-                    [
-                        html.H6(
-                            "Last Updated: "
-                            + str(covid_data_1["date"].iloc[-1].strftime("%B %d, %Y"))
-                            + "  00:01 (UTC)",
-                            style={"color": "orange"},
-                        ),
-                    ],
-                    className="one-third column",
-                    id="title1",
                 ),
             ],
             id="header",
-            className="row flex-display",
             style={"margin-bottom": "25px"},
         ),
         html.Div(
@@ -146,82 +166,49 @@ app.layout = html.Div(
                 html.Div(
                     [
                         html.H6(
-                            children="Global Cases",
+                            children="Anomalies signalées en 2021-2022",
                             style={"textAlign": "center", "color": "white"},
                         ),
                         html.P(
-                            f"{covid_data_1['confirmed'].iloc[-1]:,.0f}",
+                            f"{df_final.count()[0]}",
                             style={
                                 "textAlign": "center",
                                 "color": "orange",
                                 "fontSize": 40,
                             },
                         ),
-                        html.P(
-                            "new:  "
-                            + f"{covid_data_1['confirmed'].iloc[-1] - covid_data_1['confirmed'].iloc[-2]:,.0f} "
-                            + " ("
-                            + str(
-                                round(
-                                    (
-                                        (
-                                            covid_data_1["confirmed"].iloc[-1]
-                                            - covid_data_1["confirmed"].iloc[-2]
-                                        )
-                                        / covid_data_1["confirmed"].iloc[-1]
-                                    )
-                                    * 100,
-                                    2,
-                                )
-                            )
-                            + "%)",
-                            style={
-                                "textAlign": "center",
-                                "color": "orange",
-                                "fontSize": 15,
-                                "margin-top": "-18px",
-                            },
-                        ),
                     ],
                     className="card_container three columns",
                 ),
                 html.Div(
                     [
                         html.H6(
-                            children="Global Deaths",
+                            children="Categories des anomalies",
                             style={"textAlign": "center", "color": "white"},
                         ),
                         html.P(
-                            f"{covid_data_1['death'].iloc[-1]:,.0f}",
+                            "10",
                             style={
                                 "textAlign": "center",
                                 "color": "#dd1e35",
                                 "fontSize": 40,
                             },
                         ),
+                    ],
+                    className="card_container three columns",
+                ),
+                html.Div(
+                    [
+                        html.H6(
+                            children="Sous-categories des anomalies",
+                            style={"textAlign": "center", "color": "white"},
+                        ),
                         html.P(
-                            "new:  "
-                            + f"{covid_data_1['death'].iloc[-1] - covid_data_1['death'].iloc[-2]:,.0f} "
-                            + " ("
-                            + str(
-                                round(
-                                    (
-                                        (
-                                            covid_data_1["death"].iloc[-1]
-                                            - covid_data_1["death"].iloc[-2]
-                                        )
-                                        / covid_data_1["death"].iloc[-1]
-                                    )
-                                    * 100,
-                                    2,
-                                )
-                            )
-                            + "%)",
+                            "330",
                             style={
                                 "textAlign": "center",
-                                "color": "#dd1e35",
-                                "fontSize": 15,
-                                "margin-top": "-18px",
+                                "color": "green",
+                                "fontSize": 40,
                             },
                         ),
                     ],
@@ -230,82 +217,15 @@ app.layout = html.Div(
                 html.Div(
                     [
                         html.H6(
-                            children="Global Recovered",
+                            children="Anomalies signalées 2019-2022",
                             style={"textAlign": "center", "color": "white"},
                         ),
                         html.P(
-                            f"{covid_data_1['recovered'].iloc[-1]:,.0f}",
-                            style={
-                                "textAlign": "center",
-                                "color": "green",
-                                "fontSize": 40,
-                            },
-                        ),
-                        html.P(
-                            "new:  "
-                            + f"{covid_data_1['recovered'].iloc[-1] - covid_data_1['recovered'].iloc[-2]:,.0f} "
-                            + " ("
-                            + str(
-                                round(
-                                    (
-                                        (
-                                            covid_data_1["recovered"].iloc[-1]
-                                            - covid_data_1["recovered"].iloc[-2]
-                                        )
-                                        / covid_data_1["recovered"].iloc[-1]
-                                    )
-                                    * 100,
-                                    2,
-                                )
-                            )
-                            + "%)",
-                            style={
-                                "textAlign": "center",
-                                "color": "green",
-                                "fontSize": 15,
-                                "margin-top": "-18px",
-                            },
-                        ),
-                    ],
-                    className="card_container three columns",
-                ),
-                html.Div(
-                    [
-                        html.H6(
-                            children="Global Active",
-                            style={"textAlign": "center", "color": "white"},
-                        ),
-                        html.P(
-                            f"{covid_data_1['active'].iloc[-1]:,.0f}",
+                            "2 066 366",
                             style={
                                 "textAlign": "center",
                                 "color": "#e55467",
                                 "fontSize": 40,
-                            },
-                        ),
-                        html.P(
-                            "new:  "
-                            + f"{covid_data_1['active'].iloc[-1] - covid_data_1['active'].iloc[-2]:,.0f} "
-                            + " ("
-                            + str(
-                                round(
-                                    (
-                                        (
-                                            covid_data_1["active"].iloc[-1]
-                                            - covid_data_1["active"].iloc[-2]
-                                        )
-                                        / covid_data_1["active"].iloc[-1]
-                                    )
-                                    * 100,
-                                    2,
-                                )
-                            )
-                            + "%)",
-                            style={
-                                "textAlign": "center",
-                                "color": "#e55467",
-                                "fontSize": 15,
-                                "margin-top": "-18px",
                             },
                         ),
                     ],
@@ -317,78 +237,51 @@ app.layout = html.Div(
         html.Div(
             [
                 html.Div(
-                    [
-                        html.P(
-                            "Select Country:",
-                            className="fix_label",
-                            style={"color": "white"},
-                        ),
-                        dcc.Dropdown(
-                            id="w_countries",
-                            multi=False,
-                            clearable=True,
-                            value="US",
-                            placeholder="Select Countries",
-                            options=[
-                                {"label": c, "value": c}
-                                for c in (covid_data["Country/Region"].unique())
+                    dcc.Graph(
+                        figure=go.Figure(
+                            data=[
+                                go.Pie(
+                                    name="kek",
+                                    title="Diagramme de camembert des anomalies par arrondissement",
+                                    titlefont={"color": "white", "size": 30},
+                                    values=arrondissement_count.values,
+                                    textfont=dict(size=13),
+                                    rotation=45
+                                    # insidetextorientation='radial',
+                                ),
                             ],
-                            className="dcc_compon",
-                        ),
-                        html.P(
-                            "New Cases : "
-                            + "  "
-                            + " "
-                            + str(covid_data_2["date"].iloc[-1].strftime("%B %d, %Y"))
-                            + "  ",
-                            className="fix_label",
-                            style={"color": "white", "text-align": "center"},
-                        ),
-                        dcc.Graph(
-                            id="confirmed",
-                            config={"displayModeBar": False},
-                            className="dcc_compon",
-                            style={"margin-top": "20px"},
-                        ),
-                        dcc.Graph(
-                            id="death",
-                            config={"displayModeBar": False},
-                            className="dcc_compon",
-                            style={"margin-top": "20px"},
-                        ),
-                        dcc.Graph(
-                            id="recovered",
-                            config={"displayModeBar": False},
-                            className="dcc_compon",
-                            style={"margin-top": "20px"},
-                        ),
-                        dcc.Graph(
-                            id="active",
-                            config={"displayModeBar": False},
-                            className="dcc_compon",
-                            style={"margin-top": "20px"},
-                        ),
-                    ],
-                    className="create_container three columns",
-                    id="cross-filter-options",
+                            layout=go.Layout(
+                                width=800,
+                                height=520,
+                                plot_bgcolor="#1f2c56",
+                                paper_bgcolor="#1f2c56",
+                                hovermode="closest",
+                                legend={
+                                    "orientation": "h",
+                                    "bgcolor": "#1f2c56",
+                                    "xanchor": "center",
+                                    "x": 0.5,
+                                    "y": -0.07,
+                                },
+                                font=dict(family="sans-serif", size=12, color="white"),
+                            ),
+                        )
+                    )
                 ),
-                html.Div(
-                    [
-                        dcc.Graph(id="pie_chart", config={"displayModeBar": "hover"}),
-                    ],
-                    className="create_container four columns",
-                ),
-                html.Div(
-                    [dcc.Graph(id="line_chart")],
-                    className="create_container five columns",
-                ),
+                html.Div([dcc.Graph(id="example-graph", figure=fig4)]),
             ],
             className="row flex-display",
         ),
         html.Div(
             [
                 html.Div(
-                    [dcc.Graph(id="map")], className="create_container1 twelve columns"
+                    html.Iframe(
+                        id="maps",
+                        srcDoc=open("dashboard/assets/districts_map.html", "r").read(),
+                        width="100%",
+                        height="500",
+                    ),
+                    className="create_container1 twelve columns",
                 ),
             ],
             className="row flex-display",
