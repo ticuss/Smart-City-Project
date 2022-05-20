@@ -1,10 +1,8 @@
 from zipfile import ZipFile
-import dash
-import dash_core_components as dcc
-import dash_html_components as html
-import plotly.graph_objs as go
 import pandas as pd
+from dash import dcc, html, Dash
 import plotly.express as px
+import plotly.graph_objs as go
 
 
 def get_data(path: str) -> pd.DataFrame:
@@ -27,18 +25,18 @@ df_dec["DATE DECLARATION"] = pd.to_datetime(
 arrondissement_count = df_final["ARRONDISSEMENT"].value_counts()
 
 
-fig4 = px.line(
+fig = px.line(
     df_dec,
     x="DATE DECLARATION",
     y="SOUS TYPE DECLARATION",
     color="TYPE DECLARATION",
     title="Declarations par type",
 )
-fig4.update_xaxes(
+fig.update_xaxes(
     tickformat="%b\n%Y",
     rangeslider_visible=True,
 )
-fig4.update_layout(
+fig.update_layout(
     width=800,
     height=520,
     plot_bgcolor="#1f2c56",
@@ -50,9 +48,7 @@ fig4.update_layout(
 ),
 
 
-app = dash.Dash(
-    __name__, meta_tags=[{"name": "viewport", "content": "width=device-width"}]
-)
+app = Dash(__name__, meta_tags=[{"name": "viewport", "content": "width=device-width"}])
 
 app.layout = html.Div(
     [
@@ -169,8 +165,7 @@ app.layout = html.Div(
                                     labels=arrondissement_count.index,
                                     values=arrondissement_count.values,
                                     textfont=dict(size=13),
-                                    rotation=45
-                                    # insidetextorientation='radial',
+                                    rotation=45,
                                 ),
                             ],
                             layout=go.Layout(
@@ -191,7 +186,7 @@ app.layout = html.Div(
                         )
                     )
                 ),
-                html.Div([dcc.Graph(id="example-graph", figure=fig4)]),
+                html.Div([dcc.Graph(id="example-graph", figure=fig)]),
             ],
             className="row flex-display",
         ),
